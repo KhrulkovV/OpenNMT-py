@@ -57,6 +57,19 @@ def model_opts(parser):
               help="""If -feat_merge_size is not set, feature
                        embedding sizes will be set to N^feat_vec_exponent
                        where N is the number of values the feature takes.""")
+    
+    #----------------------------------------------------------------------------
+    #ADD TT--EMBEDDING PARAMS
+    group = parser.add_argument_group('TT-Embedding')
+    group.add('--use_tt', '-use_tt', type=bool, default=False,
+              help="""If True, then use TT--embedding layer. Default is False.""")
+    
+    group.add('--tt_rank', '-tt_rank', type=int, default=8,
+              help="""Choose TT--rank. Default is 8.""")
+    
+    group.add('--n_factors', '-n_factors', type=int, default=3,
+              help="""The number of factors in shape quantization. Default is 3.""")
+    #----------------------------------------------------------------------------
 
     # Encoder-Decoder Options
     group = parser.add_argument_group('Model- Encoder-Decoder')

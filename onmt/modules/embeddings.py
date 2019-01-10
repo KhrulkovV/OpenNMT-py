@@ -3,6 +3,7 @@ import math
 
 import torch
 import torch.nn as nn
+import t3nsor as t3
 
 from onmt.modules.util_class import Elementwise
 
@@ -84,11 +85,17 @@ class Embeddings(nn.Module):
         feat_vec_size (int): embedding dimension for features when using
                     `-feat_merge mlp`
         dropout (float): dropout probability.
+        use_tt (bool): if True, then use TT--embedding layer
+        tt_rank (int): TT-rank
+        n_factors (int): the number of factors in shape quantization
     """
 
     def __init__(self, word_vec_size,
                  word_vocab_size,
                  word_padding_idx,
+                 use_tt=False,
+                 tt_rank=8,
+                 n_factors=3,
                  position_encoding=False,
                  feat_merge="concat",
                  feat_vec_exponent=0.7, feat_vec_size=-1,
@@ -124,8 +131,15 @@ class Embeddings(nn.Module):
         # The embedding matrix look-up tables. The first look-up table
         # is for words. Subsequent ones are for features, if any exist.
         emb_params = zip(vocab_sizes, emb_dims, pad_indices)
-        embeddings = [nn.Embedding(vocab, dim, padding_idx=pad, sparse=sparse)
+        
+        if use_tt:
+             embeddings = [t3.TTEmbedding(voc_size=vocab, emb_size=dim, auto_shapes=True, d=n_factors,
+                                          tt_rank=tt_rank, padding_idx=pad) for vocab, dim, pad in emb_params]
+        
+        else: 
+            embeddings = [nn.Embedding(vocab, dim, padding_idx=pad, sparse=sparse)
                       for vocab, dim, pad in emb_params]
+        
         emb_luts = Elementwise(feat_merge, embeddings)
 
         # The final output size of word + feature vectors. This can vary

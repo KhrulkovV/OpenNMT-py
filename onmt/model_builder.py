@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 from torch.nn.init import xavier_uniform_
 
+
 import onmt.inputters as inputters
 import onmt.modules
 from onmt.encoders.rnn_encoder import RNNEncoder
@@ -45,6 +46,9 @@ def build_embeddings(opt, word_field, feat_fields, for_encoder=True):
         word_vec_size=emb_dim,
         position_encoding=opt.position_encoding,
         feat_merge=opt.feat_merge,
+        use_tt=opt.use_tt,
+        tt_rank=opt.tt_rank,
+        n_factors=opt.n_factors,
         feat_vec_exponent=opt.feat_vec_exponent,
         feat_vec_size=opt.feat_vec_size,
         dropout=opt.dropout,
@@ -279,11 +283,14 @@ def build_base_model(model_opt, fields, gpu, checkpoint=None):
                 p.data.uniform_(-model_opt.param_init, model_opt.param_init)
         if model_opt.param_init_glorot:
             for p in model.parameters():
-                if p.dim() > 1:
-                    xavier_uniform_(p)
+                if not hasattr(p, 'is_tt'):
+                    if p.dim() > 1:
+                        xavier_uniform_(p)
+                        
             for p in generator.parameters():
-                if p.dim() > 1:
-                    xavier_uniform_(p)
+                if not hasattr(p, 'is_tt'):
+                    if p.dim() > 1:
+                        xavier_uniform_(p)
 
         if hasattr(model.encoder, 'embeddings'):
             model.encoder.embeddings.load_pretrained_vectors(
