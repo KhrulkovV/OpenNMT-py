@@ -1,3 +1,4 @@
+apt-get update
 apt-get install cmake pkg-config libprotobuf9v5 protobuf-compiler libprotobuf-dev libgoogle-perftools-dev
 apt-get install libprotobuf9v5
 
