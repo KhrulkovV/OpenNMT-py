@@ -2,6 +2,12 @@ apt-get update
 apt-get install cmake pkg-config libprotobuf9v5 protobuf-compiler libprotobuf-dev libgoogle-perftools-dev
 apt-get install libprotobuf9v5
 
+cd OpenNMT-py
+pip install -r requirements.txt
+
+cd ..
+
+
 git clone https://github.com/google/sentencepiece.git
 cd sentencepiece
 mkdir build
@@ -24,3 +30,4 @@ python OpenNMT-py/preprocess.py -train_src data/train.en \
     -src_seq_length 100 -tgt_seq_length 100 \ 
     -max_shard_size 200000000 -share_vocab
 
+mkdir model
